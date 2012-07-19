@@ -14,6 +14,7 @@
  */
 package org.candlepin.model;
 
+import org.apache.log4j.Logger;
 import org.candlepin.service.ProductServiceAdapter;
 
 import com.google.inject.Inject;
@@ -42,6 +43,9 @@ public class OwnerInfoCurator {
     private static final String DEFAULT_CONSUMER_TYPE = "system";
     private StatisticCuratorQueries statisticCuratorQueries;
 
+    private static Logger log = Logger
+        .getLogger(OwnerInfoCurator.class);
+
     @Inject
     public OwnerInfoCurator(Provider<EntityManager> entityManager,
         ConsumerTypeCurator consumerTypeCurator, ProductServiceAdapter psa,
@@ -54,13 +58,14 @@ public class OwnerInfoCurator {
 
     public OwnerInfo lookupByOwner(Owner owner) {
         OwnerInfo info = new OwnerInfo();
-
+        long start = System.currentTimeMillis();
         List<ConsumerType> types = consumerTypeCurator.listAll();
         for (ConsumerType type : types) {
             Criteria c = currentSession().createCriteria(Consumer.class)
                 .add(Restrictions.eq("owner", owner))
                 .add(Restrictions.eq("type", type));
             c.setProjection(Projections.rowCount());
+            c.setCacheable(true);
             int consumers = (Integer) c.uniqueResult();
 
             c = currentSession().createCriteria(Entitlement.class)
@@ -78,6 +83,7 @@ public class OwnerInfoCurator {
 
             info.addTypeTotal(type, consumers, entitlements);
         }
+        log.info("##### Completed CONSUMER_TYPES: " + (System.currentTimeMillis() - start));
 
         Date now = new Date();
         info.setConsumerTypesByPool(consumerTypeCurator.listAll());
@@ -87,6 +93,8 @@ public class OwnerInfoCurator {
         info.setTotalSubscriptionsConsumed(statisticCuratorQueries
             .getStatisticsByOwner(owner, "TOTALSUBSCRIPTIONSCONSUMED",
                    null, null, null, null));
+
+        start = System.currentTimeMillis();
         for (Pool pool : owner.getPools()) {
             // clients using the ownerinfo details are only concerned with pools
             // active *right now*
@@ -134,6 +142,7 @@ public class OwnerInfoCurator {
                 info.addToEntitlementsConsumedByFamily(productFamily, count, 0);
             }
         }
+        log.info("##### Completed Pool Processing: " + (System.currentTimeMillis() - start));
 
         setConsumerGuestCounts(owner, info);
         setConsumerCountsByComplianceStatus(owner, info);

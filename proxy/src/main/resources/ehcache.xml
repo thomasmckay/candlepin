@@ -1,0 +1,37 @@
+<ehcache>
+  <diskStore path="java.io.tmpdir"/>
+  <defaultCache
+     maxEntriesLocalHeap="10000"
+     eternal="false"
+     timeToIdleSeconds="120"
+     timeToLiveSeconds="120"
+     overflowToDisk="true"
+     maxEntriesLocalDisk="10000000"
+     diskPersistent="false"
+     diskExpiryThreadIntervalSeconds="120"
+     memoryStoreEvictionPolicy="LRU"
+  />
+<cache
+    name="org.candlepin.model.Product"
+    maxElementsInMemory="5000"
+    eternal="false"
+    overflowToDisk="false"
+    timeToIdleSeconds="300"
+    timeToLiveSeconds="600"
+/>
+<cache
+    name="org.candlepin.model.Product.attributes"
+    maxElementsInMemory="5000"
+    eternal="false"
+    overflowToDisk="false"
+    timeToIdleSeconds="600"
+    timeToLiveSeconds="600"
+/>
+<cache
+    name="org.hibernate.cache.StandardQueryCache"
+    maxEntriesLocalHeap="5"
+    eternal="false"
+    timeToLiveSeconds="120"
+    overflowToDisk="true"/>
+</ehcache>
+

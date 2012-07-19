@@ -14,17 +14,21 @@
  */
 package org.candlepin.model;
 
+import org.apache.log4j.Logger;
 import org.candlepin.auth.interceptor.EnforceAccessControl;
-
-import com.google.inject.persist.Transactional;
-
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.stat.SecondLevelCacheStatistics;
+import org.hibernate.stat.Statistics;
+
+import com.google.inject.persist.Transactional;
 
 /**
  * interact with Products.
  */
 public class ProductCurator extends AbstractHibernateCurator<Product> {
+    private static Logger log = Logger
+        .getLogger(ProductCurator.class);
 
     /**
      * default ctor
@@ -39,8 +43,11 @@ public class ProductCurator extends AbstractHibernateCurator<Product> {
      */
     @Transactional
     public Product lookupByName(String name) {
-        return (Product) currentSession().createCriteria(Product.class)
+        Product p = (Product) currentSession().createCriteria(Product.class)
             .add(Restrictions.eq("name", name)).uniqueResult();
+        Statistics stats = currentSession().getSessionFactory().getStatistics();
+        log.info("##### CACHE STATS (NAME): " + stats);
+        return p;
     }
 
     /**
@@ -49,8 +56,13 @@ public class ProductCurator extends AbstractHibernateCurator<Product> {
      */
     @Transactional
     public Product lookupById(String id) {
-        return (Product) currentSession().createCriteria(Product.class)
-            .add(Restrictions.eq("id", id)).uniqueResult();
+
+        Product p = (Product) currentSession().createCriteria(Product.class)
+            .add(Restrictions.naturalId().set("id", id)).setCacheable(true).uniqueResult();
+
+        Statistics stats = currentSession().getSessionFactory().getStatistics();
+        log.info("##### CACHE STATS (ID): " + stats);
+        return p;
     }
 
     /**

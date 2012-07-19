@@ -77,13 +77,20 @@ public class DefaultProductServiceAdapter implements ProductServiceAdapter {
 
     @Override
     public Product getProductById(String id) {
-        log.debug("called getProductById");
-        return prodCurator.lookupById(id);
+        long start = System.currentTimeMillis();
+        log.debug("getProductById START: " + start);
+        Product p = prodCurator.lookupById(id);
+        log.debug("getProductById END: " + (System.currentTimeMillis() - start));
+        return p;
     }
 
     @Override
     public List<Product> getProducts() {
-        return prodCurator.listAll();
+        long start = System.currentTimeMillis();
+        log.debug("ALL PROD START: " + start);
+        List<Product> products = prodCurator.listAll();
+        log.debug("ALL PROD END: " + (System.currentTimeMillis() - start));
+        return products;
     }
 
     @Override

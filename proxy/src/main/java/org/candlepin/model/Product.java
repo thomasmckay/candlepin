@@ -31,6 +31,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CollectionOfElements;
 
@@ -43,6 +45,7 @@ import org.hibernate.annotations.CollectionOfElements;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "cp_product")
 public class Product extends AbstractHibernateObject implements Linkable {
 
@@ -70,6 +73,7 @@ public class Product extends AbstractHibernateObject implements Linkable {
     @Cascade({ org.hibernate.annotations.CascadeType.ALL,
         org.hibernate.annotations.CascadeType.MERGE,
         org.hibernate.annotations.CascadeType.DELETE_ORPHAN })
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<ProductAttribute> attributes = new HashSet<ProductAttribute>();
 
     @CollectionOfElements
