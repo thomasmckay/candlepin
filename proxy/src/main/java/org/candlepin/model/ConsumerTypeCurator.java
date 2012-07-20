@@ -35,6 +35,7 @@ public class ConsumerTypeCurator extends AbstractHibernateCurator<ConsumerType> 
     public ConsumerType lookupByLabel(String label) {
         return (ConsumerType) currentSession().createCriteria(
             ConsumerType.class).add(Restrictions.eq("label", label))
+            .setCacheable(true)
             .uniqueResult();
     }
 }
