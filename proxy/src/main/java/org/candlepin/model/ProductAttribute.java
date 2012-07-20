@@ -27,6 +27,8 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Index;
@@ -37,6 +39,7 @@ import org.hibernate.annotations.Index;
 @Entity
 @Table(name = "cp_product_attribute")
 @Embeddable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ProductAttribute extends AbstractHibernateObject implements Attribute {
 
     @Id

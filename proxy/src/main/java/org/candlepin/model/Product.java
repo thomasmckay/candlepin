@@ -78,13 +78,16 @@ public class Product extends AbstractHibernateObject implements Linkable {
 
     @CollectionOfElements
     @JoinTable(name = "cp_product_content", joinColumns = @JoinColumn(name = "product_id"))
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<ProductContent> productContent = new HashSet<ProductContent>();
 
     @ManyToMany(mappedBy = "providedProducts")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<Subscription> subscriptions = new HashSet<Subscription>();
 
     @CollectionOfElements(targetElement = String.class)
     @JoinTable(name = "cp_product_dependent_products")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<String> dependentProductIds = new HashSet<String>();
 
     /**

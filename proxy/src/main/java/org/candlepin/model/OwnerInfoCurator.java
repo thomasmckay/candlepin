@@ -73,6 +73,7 @@ public class OwnerInfoCurator {
                 .createCriteria("consumer")
                 .add(Restrictions.eq("owner", owner))
                 .add(Restrictions.eq("type", type));
+            c.setCacheable(true);
 
             // If there's no rows summed, quantity returns null.
             Object result = c.uniqueResult();
