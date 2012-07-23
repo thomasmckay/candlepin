@@ -14,6 +14,8 @@
  */
 package org.candlepin.model;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -32,6 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "consumertype")
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "cp_consumer_type")
 public class ConsumerType extends AbstractHibernateObject {
 
