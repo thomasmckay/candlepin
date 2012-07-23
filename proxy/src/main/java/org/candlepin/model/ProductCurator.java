@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import org.candlepin.auth.interceptor.EnforceAccessControl;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.stat.SecondLevelCacheStatistics;
 import org.hibernate.stat.Statistics;
 
 import com.google.inject.persist.Transactional;
@@ -57,8 +56,14 @@ public class ProductCurator extends AbstractHibernateCurator<Product> {
     @Transactional
     public Product lookupById(String id) {
 
-        Product p = (Product) currentSession().createCriteria(Product.class)
-            .add(Restrictions.naturalId().set("id", id)).setCacheable(true).uniqueResult();
+        //Product p = (Product) currentSession()
+        //    .createCriteria(Product.class)
+        //    .add(Restrictions.naturalId().set("id", id))
+        //    .setCacheable(false).uniqueResult();
+        Product p = (Product) currentSession()
+            .createQuery("from Product p where p.id = :product_id")
+            .setCacheable(true)
+            .setParameter("product_id", id).uniqueResult();
 
         Statistics stats = currentSession().getSessionFactory().getStatistics();
         log.info("##### CACHE STATS (ID): " + stats);
