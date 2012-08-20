@@ -14,7 +14,10 @@
  */
 package org.candlepin.policy.js;
 
+
 import java.util.Date;
+import org.eclipse.wst.jsdt.debug.rhino.debugger.RhinoDebugger;
+
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -103,9 +106,22 @@ public class JsRulesProvider implements Provider<JsRules> {
 
         log.debug("Recompiling rules with timestamp: " + newUpdated);
 
+
+
         Context context = Context.enter();
-        context.setOptimizationLevel(9);
         scope = context.initStandardObjects(null, true);
+        String  rhino = "transport=socket,suspend=y,address=9999";
+        RhinoDebugger debugger = new RhinoDebugger(rhino);
+        try {
+            debugger.start();
+        }
+        catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        context.getFactory().addListener(debugger);
+        //context.setOptimizationLevel(9);
+
         try {
             script = context.compileString(rulesCurator.getRules().getRules(), "rules", 1,
                 null);
@@ -127,14 +143,19 @@ public class JsRulesProvider implements Provider<JsRules> {
          */
         // try and recompile (if needed) first
         compileRules(this.rulesCurator);
-        Scriptable rulesScope;
+        Scriptable rulesScope = null;
         scriptLock.readLock().lock();
         try {
             Context context = Context.enter();
             rulesScope = context.newObject(scope);
             rulesScope.setPrototype(scope);
             rulesScope.setParentScope(null);
+
             Context.exit();
+        }
+        catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         finally {
             scriptLock.readLock().unlock();
