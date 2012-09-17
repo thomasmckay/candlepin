@@ -10,6 +10,7 @@ require 'buildr/java/emma'
 require 'net/http'
 require 'rspec/core/rake_task'
 require 'json'
+require 'buildr-findBugs'
 
 #############################################################################
 
