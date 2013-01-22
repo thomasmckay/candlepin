@@ -53,6 +53,7 @@ import org.mockito.stubbing.Answer;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -188,6 +189,42 @@ public class HypervisorResourceTest {
         assertEquals("test-host", c1.getUuid());
         assertEquals(1, c1.getGuestIds().size());
         assertEquals("GUEST_B", c1.getGuestIds().get(0).getGuestId());
+    }
+
+    @Test
+    public void hypervisorCheckInUpdatesGuestIdsEmptyWhenHostConsumerExists() throws Exception {
+        Owner owner = new Owner("admin");
+
+        Map<String, List<GuestId>> hostGuestMap = new HashMap<String, List<GuestId>>();
+        List<GuestId> emptyGuestList = new ArrayList<GuestId>();
+        //hostGuestMap.put("test-host", emptyGuestList);
+        hostGuestMap.put("test-host", Arrays.asList(new GuestId("GUEST_B")));
+        hostGuestMap.put("test-host-empty", emptyGuestList);
+
+        Consumer existing = new Consumer();
+        existing.setUuid("test-host");
+        existing.addGuestId(new GuestId("GUEST_A"));
+
+        Consumer existingEmpty = new Consumer();
+        existingEmpty.setUuid("test-host-empty");
+        existingEmpty.addGuestId(new GuestId("GUEST_EMPTY"));
+
+        when(consumerCurator.findByUuid(eq("test-host"))).thenReturn(existing);
+        when(consumerCurator.findByUuid(eq("test-host-empty"))).thenReturn(existingEmpty);
+
+        HypervisorCheckInResult result = hypervisorResource.hypervisorCheckIn(hostGuestMap,
+            principal, owner.getKey());
+        Set<Consumer> updated = result.getUpdated();
+        assertEquals(2, updated.size());
+
+        Consumer c1 = updated.iterator().next();
+        assertEquals("test-host", c1.getUuid());
+        assertEquals(1, c1.getGuestIds().size());
+
+       // other consumer should have an empty guestid list...
+        Consumer c2 = updated.iterator().next();
+        //assertEquals("test-host-empty", c2.getUuid());
+        assertEquals(0, c2.getGuestIds().size());
     }
 
     @Test
